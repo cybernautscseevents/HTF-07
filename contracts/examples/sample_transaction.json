@@ -1,0 +1,23 @@
+{
+  "schema_version": "1.0.0",
+  "event_id": "evt-20261008-00001",
+  "transaction_id": "txn-20261008-00001",
+  "reference": "UTR-HDFC-928374650012",
+  "sender": {
+    "account_id": "acct-sha256-a1b2c3d4",
+    "institution": "HDFC Bank",
+    "label": "Sender A"
+  },
+  "receiver": {
+    "account_id": "acct-sha256-e5f6g7h8",
+    "institution": "ICICI Bank",
+    "label": "Receiver B"
+  },
+  "amount_minor_units": 5000000,
+  "currency": "INR",
+  "occurred_at": "2026-10-08T14:30:00Z",
+  "observed_at": "2026-10-08T14:30:02Z",
+  "status": "completed",
+  "channel": "upi",
+  "origin": "bank_feed"
+}
