@@ -1,0 +1,143 @@
+[
+  {
+    "schema_version": "1.0.0",
+    "case_id": "case-sc-01-simple-chain",
+    "title": "Unauthorized Business Compromise \u2014 Linear Chain",
+    "description": "Linear laundering chain through 3 mule intermediaries to external bank cashout.",
+    "origin": "customer_report",
+    "status": "open",
+    "transaction_ids": [
+      "txn-sc-01-simple-chain-hop01"
+    ],
+    "opened_at": "2026-10-08T09:15:00Z",
+    "updated_at": "2026-10-08T09:20:00Z"
+  },
+  {
+    "schema_version": "1.0.0",
+    "case_id": "case-sc-02-fan-out",
+    "title": "Escrow Account Drain \u2014 Fan-Out Layering",
+    "description": "Parallel distribution of stolen payroll funds across 4 mule accounts.",
+    "origin": "bank_detection",
+    "status": "open",
+    "transaction_ids": [
+      "txn-sc-02-fan-out-split02",
+      "txn-sc-02-fan-out-split04",
+      "txn-sc-02-fan-out-split03",
+      "txn-sc-02-fan-out-split01"
+    ],
+    "opened_at": "2026-10-08T09:10:00Z",
+    "updated_at": "2026-10-08T09:15:00Z"
+  },
+  {
+    "schema_version": "1.0.0",
+    "case_id": "case-sc-03-fan-in",
+    "title": "Multi-Source Funneling \u2014 Fan-In Consolidation",
+    "description": "High-value consolidation of dispersed funds into a single cross-bank aggregator.",
+    "origin": "shared_intelligence",
+    "status": "open",
+    "transaction_ids": [
+      "txn-sc-03-fan-in-join02",
+      "txn-sc-03-fan-in-join01",
+      "txn-sc-03-fan-in-join03"
+    ],
+    "opened_at": "2026-10-08T09:20:00Z",
+    "updated_at": "2026-10-08T09:25:00Z"
+  },
+  {
+    "schema_version": "1.0.0",
+    "case_id": "case-sc-04-fan-out-fan-in",
+    "title": "Diamond Topology Flow \u2014 Chokepoint Convergence",
+    "description": "Split-and-recombine laundering flow converging onto chokepoint before exfiltration.",
+    "origin": "customer_report",
+    "status": "open",
+    "transaction_ids": [
+      "txn-sc-04-fan-out-fan-in-01-seed"
+    ],
+    "opened_at": "2026-10-08T09:08:00Z",
+    "updated_at": "2026-10-08T09:13:00Z"
+  },
+  {
+    "schema_version": "1.0.0",
+    "case_id": "case-sc-05-commingling",
+    "title": "Commercial Mixing \u2014 Commingling Inflow Analysis",
+    "description": "Illicit capital blended with genuine commercial retail turnover.",
+    "origin": "bank_detection",
+    "status": "open",
+    "transaction_ids": [
+      "txn-sc-05-commingling-fraud-in"
+    ],
+    "opened_at": "2026-10-08T09:25:00Z",
+    "updated_at": "2026-10-08T09:30:00Z"
+  },
+  {
+    "schema_version": "1.0.0",
+    "case_id": "case-sc-06-cold-start",
+    "title": "Zero-History Ingress \u2014 Cold-Start Layering",
+    "description": "Fraudulent transfer directed into recently provisioned accounts with no prior telemetry.",
+    "origin": "bank_detection",
+    "status": "open",
+    "transaction_ids": [
+      "txn-sc-06-cold-start-fraud-hop01"
+    ],
+    "opened_at": "2026-10-08T09:10:00Z",
+    "updated_at": "2026-10-08T09:15:00Z"
+  },
+  {
+    "schema_version": "1.0.0",
+    "case_id": "case-sc-07-cross-bank",
+    "title": "Inter-Institutional Laundering \u2014 4-Bank Hop",
+    "description": "Cross-bank exfiltration spanning BANK_A, BANK_B, BANK_C, and BANK_D.",
+    "origin": "shared_intelligence",
+    "status": "open",
+    "transaction_ids": [
+      "txn-sc-07-cross-bank-hop01-a-b"
+    ],
+    "opened_at": "2026-10-08T09:12:00Z",
+    "updated_at": "2026-10-08T09:17:00Z"
+  },
+  {
+    "schema_version": "1.0.0",
+    "case_id": "case-sc-08-smurfing",
+    "title": "Micro-Flow Structuring \u2014 High-Frequency Smurfing",
+    "description": "20 deliberately small micro-transactions structured to remain sub-threshold according to the benchmark's configurable micro-flow threshold.",
+    "origin": "bank_detection",
+    "status": "open",
+    "transaction_ids": [
+      "txn-sc-08-smurfing-smurf001",
+      "txn-sc-08-smurfing-smurf002",
+      "txn-sc-08-smurfing-smurf003",
+      "txn-sc-08-smurfing-smurf004",
+      "txn-sc-08-smurfing-smurf005",
+      "txn-sc-08-smurfing-smurf006",
+      "txn-sc-08-smurfing-smurf007",
+      "txn-sc-08-smurfing-smurf008",
+      "txn-sc-08-smurfing-smurf009",
+      "txn-sc-08-smurfing-smurf010",
+      "txn-sc-08-smurfing-smurf011",
+      "txn-sc-08-smurfing-smurf012",
+      "txn-sc-08-smurfing-smurf013",
+      "txn-sc-08-smurfing-smurf014",
+      "txn-sc-08-smurfing-smurf015",
+      "txn-sc-08-smurfing-smurf016",
+      "txn-sc-08-smurfing-smurf017",
+      "txn-sc-08-smurfing-smurf018",
+      "txn-sc-08-smurfing-smurf019",
+      "txn-sc-08-smurfing-smurf020"
+    ],
+    "opened_at": "2026-10-08T10:00:00Z",
+    "updated_at": "2026-10-08T10:05:00Z"
+  },
+  {
+    "schema_version": "1.0.0",
+    "case_id": "case-sc-09-rapid-pass-through",
+    "title": "High-Velocity Relay \u2014 Sub-Minute Dwell Time",
+    "description": "Laundering chain moving through 4 accounts in under 3 minutes total elapsed time.",
+    "origin": "bank_detection",
+    "status": "open",
+    "transaction_ids": [
+      "txn-sc-09-rapid-pass-through-hop01"
+    ],
+    "opened_at": "2026-10-08T09:05:00Z",
+    "updated_at": "2026-10-08T09:10:00Z"
+  }
+]

@@ -1,0 +1,406 @@
+[
+  {
+    "scenario_id": "sc-01-simple-chain",
+    "scenario_type": "simple_chain",
+    "case_id": "case-sc-01-simple-chain",
+    "seed_transaction_ids": [
+      "txn-sc-01-simple-chain-hop01"
+    ],
+    "fraud_transaction_ids": [
+      "txn-sc-01-simple-chain-hop01",
+      "txn-sc-01-simple-chain-hop02",
+      "txn-sc-01-simple-chain-hop03",
+      "txn-sc-01-simple-chain-hop04"
+    ],
+    "fraud_accounts": [
+      "sc-01-simple-chain-acc-bank_a-mule-0002",
+      "sc-01-simple-chain-acc-bank_b-mule-0003",
+      "sc-01-simple-chain-acc-bank_b-mule-0004",
+      "sc-01-simple-chain-acc-bank_c-exfiltration-0005"
+    ],
+    "source_account": "sc-01-simple-chain-acc-bank_a-victim-0001",
+    "intended_downstream_path": [
+      "sc-01-simple-chain-acc-bank_a-victim-0001",
+      "sc-01-simple-chain-acc-bank_a-mule-0002",
+      "sc-01-simple-chain-acc-bank_b-mule-0003",
+      "sc-01-simple-chain-acc-bank_b-mule-0004",
+      "sc-01-simple-chain-acc-bank_c-exfiltration-0005"
+    ],
+    "intended_next_hop_label": {
+      "sc-01-simple-chain-acc-bank_a-victim-0001": "sc-01-simple-chain-acc-bank_a-mule-0002",
+      "sc-01-simple-chain-acc-bank_a-mule-0002": "sc-01-simple-chain-acc-bank_b-mule-0003",
+      "sc-01-simple-chain-acc-bank_b-mule-0003": "sc-01-simple-chain-acc-bank_b-mule-0004",
+      "sc-01-simple-chain-acc-bank_b-mule-0004": "sc-01-simple-chain-acc-bank_c-exfiltration-0005"
+    },
+    "expected_convergence_account": null,
+    "injected_fraud_amount": 50000000,
+    "metadata": {
+      "hop_count": 4,
+      "hop_delay_seconds": 300.0
+    }
+  },
+  {
+    "scenario_id": "sc-02-fan-out",
+    "scenario_type": "fan_out",
+    "case_id": "case-sc-02-fan-out",
+    "seed_transaction_ids": [
+      "txn-sc-02-fan-out-split02",
+      "txn-sc-02-fan-out-split04",
+      "txn-sc-02-fan-out-split03",
+      "txn-sc-02-fan-out-split01"
+    ],
+    "fraud_transaction_ids": [
+      "txn-sc-02-fan-out-split02",
+      "txn-sc-02-fan-out-split04",
+      "txn-sc-02-fan-out-split03",
+      "txn-sc-02-fan-out-split01"
+    ],
+    "fraud_accounts": [
+      "sc-02-fan-out-acc-bank_a-mule-0002",
+      "sc-02-fan-out-acc-bank_b-mule-0003",
+      "sc-02-fan-out-acc-bank_c-mule-0004",
+      "sc-02-fan-out-acc-bank_d-mule-0005"
+    ],
+    "source_account": "sc-02-fan-out-acc-bank_a-victim-0001",
+    "intended_downstream_path": [
+      "sc-02-fan-out-acc-bank_a-victim-0001",
+      "sc-02-fan-out-acc-bank_a-mule-0002",
+      "sc-02-fan-out-acc-bank_b-mule-0003",
+      "sc-02-fan-out-acc-bank_c-mule-0004",
+      "sc-02-fan-out-acc-bank_d-mule-0005"
+    ],
+    "intended_next_hop_label": {
+      "sc-02-fan-out-acc-bank_a-victim-0001": [
+        "sc-02-fan-out-acc-bank_a-mule-0002",
+        "sc-02-fan-out-acc-bank_b-mule-0003",
+        "sc-02-fan-out-acc-bank_c-mule-0004",
+        "sc-02-fan-out-acc-bank_d-mule-0005"
+      ]
+    },
+    "expected_convergence_account": null,
+    "injected_fraud_amount": 80000000,
+    "metadata": {
+      "fan_out_degree": 4
+    }
+  },
+  {
+    "scenario_id": "sc-03-fan-in",
+    "scenario_type": "fan_in",
+    "case_id": "case-sc-03-fan-in",
+    "seed_transaction_ids": [
+      "txn-sc-03-fan-in-join02",
+      "txn-sc-03-fan-in-join01",
+      "txn-sc-03-fan-in-join03"
+    ],
+    "fraud_transaction_ids": [
+      "txn-sc-03-fan-in-join02",
+      "txn-sc-03-fan-in-join01",
+      "txn-sc-03-fan-in-join03"
+    ],
+    "fraud_accounts": [
+      "sc-03-fan-in-acc-bank_a-mule-0001",
+      "sc-03-fan-in-acc-bank_b-mule-0002",
+      "sc-03-fan-in-acc-bank_c-mule-0003",
+      "sc-03-fan-in-acc-bank_d-aggregator-0004"
+    ],
+    "source_account": null,
+    "intended_downstream_path": [
+      "sc-03-fan-in-acc-bank_a-mule-0001",
+      "sc-03-fan-in-acc-bank_b-mule-0002",
+      "sc-03-fan-in-acc-bank_c-mule-0003",
+      "sc-03-fan-in-acc-bank_d-aggregator-0004"
+    ],
+    "intended_next_hop_label": {
+      "sc-03-fan-in-acc-bank_a-mule-0001": "sc-03-fan-in-acc-bank_d-aggregator-0004",
+      "sc-03-fan-in-acc-bank_b-mule-0002": "sc-03-fan-in-acc-bank_d-aggregator-0004",
+      "sc-03-fan-in-acc-bank_c-mule-0003": "sc-03-fan-in-acc-bank_d-aggregator-0004"
+    },
+    "expected_convergence_account": "sc-03-fan-in-acc-bank_d-aggregator-0004",
+    "injected_fraud_amount": 75000000,
+    "metadata": {
+      "feeder_count": 3,
+      "convergence_account": "sc-03-fan-in-acc-bank_d-aggregator-0004"
+    }
+  },
+  {
+    "scenario_id": "sc-04-fan-out-fan-in",
+    "scenario_type": "fan_out_fan_in",
+    "case_id": "case-sc-04-fan-out-fan-in",
+    "seed_transaction_ids": [
+      "txn-sc-04-fan-out-fan-in-01-seed"
+    ],
+    "fraud_transaction_ids": [
+      "txn-sc-04-fan-out-fan-in-01-seed",
+      "txn-sc-04-fan-out-fan-in-02-split01",
+      "txn-sc-04-fan-out-fan-in-02-split02",
+      "txn-sc-04-fan-out-fan-in-02-split03",
+      "txn-sc-04-fan-out-fan-in-03-reconv01",
+      "txn-sc-04-fan-out-fan-in-03-reconv02",
+      "txn-sc-04-fan-out-fan-in-03-reconv03",
+      "txn-sc-04-fan-out-fan-in-04-exit"
+    ],
+    "fraud_accounts": [
+      "sc-04-fan-out-fan-in-acc-bank_a-mule-0002",
+      "sc-04-fan-out-fan-in-acc-bank_b-mule-0003",
+      "sc-04-fan-out-fan-in-acc-bank_b-mule-0004",
+      "sc-04-fan-out-fan-in-acc-bank_c-mule-0005",
+      "sc-04-fan-out-fan-in-acc-bank_c-chokepoint-0006",
+      "sc-04-fan-out-fan-in-acc-bank_d-exfiltration-0007"
+    ],
+    "source_account": "sc-04-fan-out-fan-in-acc-bank_a-victim-0001",
+    "intended_downstream_path": [
+      "sc-04-fan-out-fan-in-acc-bank_a-victim-0001",
+      "sc-04-fan-out-fan-in-acc-bank_a-mule-0002",
+      "sc-04-fan-out-fan-in-acc-bank_c-chokepoint-0006",
+      "sc-04-fan-out-fan-in-acc-bank_d-exfiltration-0007"
+    ],
+    "intended_next_hop_label": {
+      "sc-04-fan-out-fan-in-acc-bank_a-victim-0001": "sc-04-fan-out-fan-in-acc-bank_a-mule-0002",
+      "sc-04-fan-out-fan-in-acc-bank_a-mule-0002": [
+        "sc-04-fan-out-fan-in-acc-bank_b-mule-0003",
+        "sc-04-fan-out-fan-in-acc-bank_b-mule-0004",
+        "sc-04-fan-out-fan-in-acc-bank_c-mule-0005"
+      ],
+      "sc-04-fan-out-fan-in-acc-bank_b-mule-0003": "sc-04-fan-out-fan-in-acc-bank_c-chokepoint-0006",
+      "sc-04-fan-out-fan-in-acc-bank_b-mule-0004": "sc-04-fan-out-fan-in-acc-bank_c-chokepoint-0006",
+      "sc-04-fan-out-fan-in-acc-bank_c-mule-0005": "sc-04-fan-out-fan-in-acc-bank_c-chokepoint-0006",
+      "sc-04-fan-out-fan-in-acc-bank_c-chokepoint-0006": "sc-04-fan-out-fan-in-acc-bank_d-exfiltration-0007"
+    },
+    "expected_convergence_account": "sc-04-fan-out-fan-in-acc-bank_c-chokepoint-0006",
+    "injected_fraud_amount": 60000000,
+    "metadata": {
+      "chokepoint_account": "sc-04-fan-out-fan-in-acc-bank_c-chokepoint-0006",
+      "intermediate_count": 3
+    }
+  },
+  {
+    "scenario_id": "sc-05-commingling",
+    "scenario_type": "commingling",
+    "case_id": "case-sc-05-commingling",
+    "seed_transaction_ids": [
+      "txn-sc-05-commingling-fraud-in"
+    ],
+    "fraud_transaction_ids": [
+      "txn-sc-05-commingling-fraud-in",
+      "txn-sc-05-commingling-blended-out"
+    ],
+    "fraud_accounts": [
+      "sc-05-commingling-acc-bank_b-commingler-0002",
+      "sc-05-commingling-acc-bank_c-exfiltration-0003"
+    ],
+    "source_account": "sc-05-commingling-acc-bank_a-victim-0001",
+    "intended_downstream_path": [
+      "sc-05-commingling-acc-bank_a-victim-0001",
+      "sc-05-commingling-acc-bank_b-commingler-0002",
+      "sc-05-commingling-acc-bank_c-exfiltration-0003"
+    ],
+    "intended_next_hop_label": {
+      "sc-05-commingling-acc-bank_a-victim-0001": "sc-05-commingling-acc-bank_b-commingler-0002",
+      "sc-05-commingling-acc-bank_b-commingler-0002": "sc-05-commingling-acc-bank_c-exfiltration-0003"
+    },
+    "expected_convergence_account": "sc-05-commingling-acc-bank_b-commingler-0002",
+    "injected_fraud_amount": 30000000,
+    "metadata": {
+      "commingler_account": "sc-05-commingling-acc-bank_b-commingler-0002",
+      "legitimate_inflow_minor_units": 22368866,
+      "legitimate_inflow_count": 5
+    }
+  },
+  {
+    "scenario_id": "sc-06-cold-start",
+    "scenario_type": "cold_start",
+    "case_id": "case-sc-06-cold-start",
+    "seed_transaction_ids": [
+      "txn-sc-06-cold-start-fraud-hop01"
+    ],
+    "fraud_transaction_ids": [
+      "txn-sc-06-cold-start-fraud-hop01",
+      "txn-sc-06-cold-start-fraud-hop02",
+      "txn-sc-06-cold-start-fraud-hop03"
+    ],
+    "fraud_accounts": [
+      "sc-06-cold-start-acc-bank_b-cold_start-0002",
+      "sc-06-cold-start-acc-bank_c-cold_start-0003",
+      "sc-06-cold-start-acc-bank_d-exfiltration-0004"
+    ],
+    "source_account": "sc-06-cold-start-acc-bank_a-victim-0001",
+    "intended_downstream_path": [
+      "sc-06-cold-start-acc-bank_a-victim-0001",
+      "sc-06-cold-start-acc-bank_b-cold_start-0002",
+      "sc-06-cold-start-acc-bank_c-cold_start-0003",
+      "sc-06-cold-start-acc-bank_d-exfiltration-0004"
+    ],
+    "intended_next_hop_label": {
+      "sc-06-cold-start-acc-bank_a-victim-0001": "sc-06-cold-start-acc-bank_b-cold_start-0002",
+      "sc-06-cold-start-acc-bank_b-cold_start-0002": "sc-06-cold-start-acc-bank_c-cold_start-0003",
+      "sc-06-cold-start-acc-bank_c-cold_start-0003": "sc-06-cold-start-acc-bank_d-exfiltration-0004"
+    },
+    "expected_convergence_account": null,
+    "injected_fraud_amount": 45000000,
+    "metadata": {
+      "cold_start_accounts": [
+        "sc-06-cold-start-acc-bank_b-cold_start-0002",
+        "sc-06-cold-start-acc-bank_c-cold_start-0003"
+      ],
+      "seed_time_iso": "2026-10-08T09:00:00+00:00"
+    }
+  },
+  {
+    "scenario_id": "sc-07-cross-bank",
+    "scenario_type": "cross_bank",
+    "case_id": "case-sc-07-cross-bank",
+    "seed_transaction_ids": [
+      "txn-sc-07-cross-bank-hop01-a-b"
+    ],
+    "fraud_transaction_ids": [
+      "txn-sc-07-cross-bank-hop01-a-b",
+      "txn-sc-07-cross-bank-hop02-b-c",
+      "txn-sc-07-cross-bank-hop03-c-d"
+    ],
+    "fraud_accounts": [
+      "sc-07-cross-bank-acc-bank_b-mule-0002",
+      "sc-07-cross-bank-acc-bank_c-mule-0003",
+      "sc-07-cross-bank-acc-bank_d-exfiltration-0004"
+    ],
+    "source_account": "sc-07-cross-bank-acc-bank_a-victim-0001",
+    "intended_downstream_path": [
+      "sc-07-cross-bank-acc-bank_a-victim-0001",
+      "sc-07-cross-bank-acc-bank_b-mule-0002",
+      "sc-07-cross-bank-acc-bank_c-mule-0003",
+      "sc-07-cross-bank-acc-bank_d-exfiltration-0004"
+    ],
+    "intended_next_hop_label": {
+      "sc-07-cross-bank-acc-bank_a-victim-0001": "sc-07-cross-bank-acc-bank_b-mule-0002",
+      "sc-07-cross-bank-acc-bank_b-mule-0002": "sc-07-cross-bank-acc-bank_c-mule-0003",
+      "sc-07-cross-bank-acc-bank_c-mule-0003": "sc-07-cross-bank-acc-bank_d-exfiltration-0004"
+    },
+    "expected_convergence_account": null,
+    "injected_fraud_amount": 75000000,
+    "metadata": {
+      "banks_involved": [
+        "BANK_A",
+        "BANK_B",
+        "BANK_C",
+        "BANK_D"
+      ],
+      "rail_types": [
+        "IMPS",
+        "NEFT",
+        "RTGS"
+      ]
+    }
+  },
+  {
+    "scenario_id": "sc-08-smurfing",
+    "scenario_type": "smurfing",
+    "case_id": "case-sc-08-smurfing",
+    "seed_transaction_ids": [
+      "txn-sc-08-smurfing-smurf001"
+    ],
+    "fraud_transaction_ids": [
+      "txn-sc-08-smurfing-smurf001",
+      "txn-sc-08-smurfing-smurf002",
+      "txn-sc-08-smurfing-smurf003",
+      "txn-sc-08-smurfing-smurf004",
+      "txn-sc-08-smurfing-smurf005",
+      "txn-sc-08-smurfing-smurf006",
+      "txn-sc-08-smurfing-smurf007",
+      "txn-sc-08-smurfing-smurf008",
+      "txn-sc-08-smurfing-smurf009",
+      "txn-sc-08-smurfing-smurf010",
+      "txn-sc-08-smurfing-smurf011",
+      "txn-sc-08-smurfing-smurf012",
+      "txn-sc-08-smurfing-smurf013",
+      "txn-sc-08-smurfing-smurf014",
+      "txn-sc-08-smurfing-smurf015",
+      "txn-sc-08-smurfing-smurf016",
+      "txn-sc-08-smurfing-smurf017",
+      "txn-sc-08-smurfing-smurf018",
+      "txn-sc-08-smurfing-smurf019",
+      "txn-sc-08-smurfing-smurf020"
+    ],
+    "fraud_accounts": [
+      "sc-08-smurfing-acc-bank_b-aggregator-0002",
+      "sc-08-smurfing-acc-bank_c-aggregator-0003"
+    ],
+    "source_account": "sc-08-smurfing-acc-bank_a-victim-0001",
+    "intended_downstream_path": [
+      "sc-08-smurfing-acc-bank_a-victim-0001",
+      "sc-08-smurfing-acc-bank_b-aggregator-0002",
+      "sc-08-smurfing-acc-bank_c-aggregator-0003"
+    ],
+    "intended_next_hop_label": {
+      "sc-08-smurfing-acc-bank_a-victim-0001": [
+        "sc-08-smurfing-acc-bank_b-aggregator-0002",
+        "sc-08-smurfing-acc-bank_c-aggregator-0003"
+      ]
+    },
+    "expected_convergence_account": null,
+    "injected_fraud_amount": 90000000,
+    "metadata": {
+      "chunk_count": 20,
+      "synthetic_micro_flow_threshold_paise": 5000000,
+      "max_chunk_amount_paise": 5000000,
+      "average_chunk_amount_paise": 4500000
+    }
+  },
+  {
+    "scenario_id": "sc-09-rapid-pass-through",
+    "scenario_type": "rapid_pass_through",
+    "case_id": "case-sc-09-rapid-pass-through",
+    "seed_transaction_ids": [
+      "txn-sc-09-rapid-pass-through-hop01"
+    ],
+    "fraud_transaction_ids": [
+      "txn-sc-09-rapid-pass-through-hop01",
+      "txn-sc-09-rapid-pass-through-hop02",
+      "txn-sc-09-rapid-pass-through-hop03",
+      "txn-sc-09-rapid-pass-through-hop04"
+    ],
+    "fraud_accounts": [
+      "sc-09-rapid-pass-through-acc-bank_a-mule-0002",
+      "sc-09-rapid-pass-through-acc-bank_b-mule-0003",
+      "sc-09-rapid-pass-through-acc-bank_c-mule-0004",
+      "sc-09-rapid-pass-through-acc-bank_d-exfiltration-0005"
+    ],
+    "source_account": "sc-09-rapid-pass-through-acc-bank_a-victim-0001",
+    "intended_downstream_path": [
+      "sc-09-rapid-pass-through-acc-bank_a-victim-0001",
+      "sc-09-rapid-pass-through-acc-bank_a-mule-0002",
+      "sc-09-rapid-pass-through-acc-bank_b-mule-0003",
+      "sc-09-rapid-pass-through-acc-bank_c-mule-0004",
+      "sc-09-rapid-pass-through-acc-bank_d-exfiltration-0005"
+    ],
+    "intended_next_hop_label": {
+      "sc-09-rapid-pass-through-acc-bank_a-victim-0001": "sc-09-rapid-pass-through-acc-bank_a-mule-0002",
+      "sc-09-rapid-pass-through-acc-bank_a-mule-0002": "sc-09-rapid-pass-through-acc-bank_b-mule-0003",
+      "sc-09-rapid-pass-through-acc-bank_b-mule-0003": "sc-09-rapid-pass-through-acc-bank_c-mule-0004",
+      "sc-09-rapid-pass-through-acc-bank_c-mule-0004": "sc-09-rapid-pass-through-acc-bank_d-exfiltration-0005"
+    },
+    "expected_convergence_account": null,
+    "injected_fraud_amount": 35000000,
+    "metadata": {
+      "inter_hop_delay_seconds": 40.0,
+      "total_dwell_seconds": 120.0
+    }
+  },
+  {
+    "scenario_id": "sc-10-benign-high-volume-merchant",
+    "scenario_type": "benign_high_volume_merchant",
+    "case_id": null,
+    "seed_transaction_ids": [],
+    "fraud_transaction_ids": [],
+    "fraud_accounts": [],
+    "source_account": null,
+    "intended_downstream_path": [],
+    "intended_next_hop_label": {},
+    "expected_convergence_account": null,
+    "injected_fraud_amount": 0,
+    "metadata": {
+      "merchant_account": "sc-10-benign-high-volume-merchant-acc-bank_a-merchant-0001",
+      "total_legitimate_sales_paise": 12309545,
+      "transaction_count": 32,
+      "is_negative_control": true
+    }
+  }
+]
