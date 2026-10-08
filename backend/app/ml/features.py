@@ -219,7 +219,10 @@ def extract_account_features(
     total_inbound = sum(e.amount_minor_units for e in incoming_edges)
     total_outbound = sum(e.amount_minor_units for e in outgoing_edges)
     net_flow = total_inbound - total_outbound
-    forwarding_ratio = float(total_outbound) / max(1.0, float(total_inbound))
+    if total_inbound > 0:
+        forwarding_ratio = min(1.0, float(total_outbound) / float(total_inbound))
+    else:
+        forwarding_ratio = 0.0
 
     mean_inbound = float(total_inbound) / max(1.0, float(in_degree))
     mean_outbound = float(total_outbound) / max(1.0, float(out_degree))

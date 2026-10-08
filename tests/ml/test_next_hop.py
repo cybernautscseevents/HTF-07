@@ -55,12 +55,6 @@ def _make_event(
     )
 
 
-@pytest.fixture
-def next_hop_predictor() -> NextHopPredictor:
-    model_path = Path("backend/models/artefacts/next_hop_predictor.joblib")
-    if model_path.exists():
-        return NextHopPredictor.load(model_path)
-    return NextHopPredictor(random_state=42)
 
 
 def test_next_hop_candidate_ranking_and_softmax(next_hop_predictor: NextHopPredictor) -> None:

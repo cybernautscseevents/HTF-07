@@ -68,12 +68,10 @@ def test_cold_start_masking_evaluation() -> None:
     assert hasattr(cold_comp, "masked_metrics")
 
 
-def test_benign_merchant_negative_control() -> None:
+def test_benign_merchant_negative_control(trained_risk_model: MuleRiskModel) -> None:
     """Explicitly evaluates against benign high-volume merchant scenario."""
     world = generate_synthetic_world(seed=42)
-    model = MuleRiskModel.load("backend/models/artefacts/mule_risk_model.joblib")
-
-    neg_metrics = evaluate_negative_control(model, world)
+    neg_metrics = evaluate_negative_control(trained_risk_model, world)
     assert isinstance(neg_metrics, NegativeControlMetrics)
     assert neg_metrics.scenario_type == "benign_high_volume_merchant"
     assert neg_metrics.false_positive_rate == 0.0

@@ -59,25 +59,6 @@ def _make_event(
     )
 
 
-@pytest.fixture
-def trained_risk_model() -> MuleRiskModel:
-    """Fixture providing a fitted MuleRiskModel."""
-    model_path = Path("backend/models/artefacts/mule_risk_model.joblib")
-    if model_path.exists():
-        return MuleRiskModel.load(model_path)
-
-    # Synthetic fallback training dataset if artifact not yet built
-    np.random.seed(42)
-    n_samples = 40
-    X = np.random.randn(n_samples, len(ACCOUNT_FEATURE_NAMES)).astype(np.float32)
-    # Ensure positive features for amounts/counts
-    X[:, 0] = np.random.randint(0, 10, n_samples)  # in_degree
-    X[:, 1] = np.random.randint(0, 10, n_samples)  # out_degree
-    X[:, 23] = np.random.uniform(0.0, 1.0, n_samples)  # forwarding_ratio
-    y = (X[:, 23] > 0.7).astype(np.int32)
-    model = MuleRiskModel(random_state=42)
-    model.fit(X, y)
-    return model
 
 
 def test_risk_score_and_confidence_bounds(trained_risk_model: MuleRiskModel) -> None:
@@ -155,3 +136,39 @@ def test_benign_pattern_has_low_risk(trained_risk_model: MuleRiskModel) -> None:
     )
     # Forwarding ratio is 0.0, no rapid pass-through -> risk score should be well below 0.50
     assert pred.risk_score < 0.35, f"Expected low risk for retail merchant, got {pred.risk_score}"
+
+
+def test_benign_merchant_with_supplier_payout_has_low_risk(trained_risk_model: MuleRiskModel) -> None:
+    """Verifies that a merchant making legitimate delayed supplier payouts retains low risk."""
+    t0 = datetime(2026, 10, 8, 8, 0, 0, tzinfo=UTC)
+    g = TemporalGraph()
+    # 8 retail customer purchases over 8 hours
+    for i in range(8):
+        g.add_event(_make_event(f"sale-{i}", f"customer-{i}", "superstore", 100_000, t0 + timedelta(hours=i)))
+
+    # Legitimate supplier payout 6 hours after last sale (total delay > 6 hours, no rapid pass-through)
+    g.add_event(_make_event("payout-1", "superstore", "wholesaler", 300_000, t0 + timedelta(hours=14)))
+
+    pred = trained_risk_model.predict_risk(
+        graph=g,
+        account_id="superstore",
+        as_of_time=t0 + timedelta(hours=16),
+    )
+    assert pred.risk_score < 0.35, f"Expected low risk for merchant with delayed payout, got {pred.risk_score}"
+
+
+def test_high_velocity_mule_has_high_risk(trained_risk_model: MuleRiskModel) -> None:
+    """Verifies that an account with rapid pass-through (<2 min) and high forwarding ratio is flagged."""
+    t0 = datetime(2026, 10, 8, 12, 0, 0, tzinfo=UTC)
+    g = TemporalGraph()
+    # ₹5,00,000 in minor units (paise)
+    g.add_event(_make_event("in-1", "victim-account", "mule-account", 50_000_000, t0))
+    # Forwarded 98% within 90 seconds
+    g.add_event(_make_event("out-1", "mule-account", "cashout-account", 49_000_000, t0 + timedelta(seconds=90)))
+
+    pred = trained_risk_model.predict_risk(
+        graph=g,
+        account_id="mule-account",
+        as_of_time=t0 + timedelta(minutes=5),
+    )
+    assert pred.risk_score >= 0.70, f"Expected high risk for rapid mule, got {pred.risk_score}"
