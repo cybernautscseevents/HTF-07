@@ -322,7 +322,7 @@ class TestGraph:
     """GET /api/cases/{case_id}/graph"""
 
     @pytest.mark.asyncio
-    async def test_graph_stub_returns_nodes_and_edges(self, client):
+    async def test_graph_returns_nodes_and_edges(self, client):
         await client.post("/api/cases", content=json.dumps(VALID_CASE))
         batch = [VALID_EVENT_1, VALID_EVENT_2]
         await client.post(
