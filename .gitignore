@@ -218,3 +218,21 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# -- AEGIS-Flow additions ------------------------------------------------------
+# Real secrets
+.env
+
+# Synthetic data output (large files — re-generate via scripts)
+data/raw/
+data/processed/
+data/benchmarks/
+
+# Trained model artefacts (regenerate via training scripts)
+backend/models/artefacts/
+
+# Node / React
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.next/
