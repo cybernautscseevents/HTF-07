@@ -160,3 +160,24 @@ def test_next_hop_candidate_features() -> None:
     assert nh_feats["past_transfers_count"] == 1.0
     assert nh_feats["past_transfer_volume"] == 250_000.0
     assert nh_feats["candidate_in_degree"] == 1.0
+
+
+def test_forwarding_ratio_pure_sender_and_receiver() -> None:
+    """Verifies that an account with 0 inbound volume has forwarding_ratio=0.0 (not total_outbound)."""
+    t0 = datetime(2026, 10, 8, 10, 0, 0, tzinfo=UTC)
+    g = TemporalGraph()
+    e1 = _make_event("e1", "sender-only", "receiver-only", 750_000, t0)
+    g.add_event(e1)
+
+    feats_sender = extract_account_features(g, "sender-only", as_of_time=t0)
+    feats_receiver = extract_account_features(g, "receiver-only", as_of_time=t0)
+
+    # Pure sender forwarded 0 inbound funds -> 0.0
+    assert feats_sender["forwarding_ratio"] == 0.0
+    assert feats_sender["total_outbound_amount"] == 750_000.0
+    assert feats_sender["total_inbound_amount"] == 0.0
+
+    # Pure receiver forwarded 0 funds -> 0.0
+    assert feats_receiver["forwarding_ratio"] == 0.0
+    assert feats_receiver["total_inbound_amount"] == 750_000.0
+    assert feats_receiver["total_outbound_amount"] == 0.0
