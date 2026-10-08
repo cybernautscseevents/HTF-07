@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0.0",
+  "case_id": "case-2026-00042",
+  "title": "Multi-hop UPI laundering chain — Cluster 7",
+  "description": "Suspected layering through 4 mule accounts via rapid UPI transfers over 48-hour window.",
+  "origin": "bank_detection",
+  "status": "under_review",
+  "transaction_ids": [
+    "txn-20261008-00001",
+    "txn-20261008-00002",
+    "txn-20261008-00003",
+    "txn-20261008-00004"
+  ],
+  "opened_at": "2026-10-08T15:00:00Z",
+  "updated_at": "2026-10-08T18:45:00Z"
+}
