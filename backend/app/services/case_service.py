@@ -13,6 +13,7 @@ from contracts.case import FraudCase
 from contracts.transaction import TransactionEvent
 
 from backend.app.repositories.base import CaseRepository, EventRepository
+from backend.app.services.case_graph_registry import CaseGraphRegistry
 
 
 class CaseService:
@@ -22,13 +23,16 @@ class CaseService:
         self,
         case_repo: CaseRepository,
         event_repo: EventRepository,
+        graph_registry: CaseGraphRegistry,
     ) -> None:
         self._cases = case_repo
         self._events = event_repo
+        self._graphs = graph_registry
 
     async def create_case(self, case: FraudCase) -> FraudCase:
         """Persist a new case.  Raises ValueError on duplicate case_id."""
         await self._cases.save(case)
+        self._graphs.get_or_create(case.case_id)
         return case
 
     async def get_case(self, case_id: str) -> FraudCase | None:
@@ -46,40 +50,37 @@ class CaseService:
 
     async def get_graph(self, case_id: str) -> dict:
         """
-        Return the temporal graph for a case.
-
-        Currently returns a stub structure.  When the graph service is
-        available this will delegate to it rather than computing anything
-        inside the API layer.
+        Return a serializable representation of the actual temporal graph.
         """
         if not await self._cases.exists(case_id):
             raise ValueError(f"Case '{case_id}' not found.")
 
-        events = await self._events.get_by_case_id(case_id)
-
-        # Build a minimal node/edge manifest from stored events.
-        # The real graph topology will come from the graph engine.
-        nodes: set[str] = set()
-        edges: list[dict] = []
-        for ev in sorted(events, key=lambda e: e.occurred_at):
-            nodes.add(ev.sender.account_id)
-            nodes.add(ev.receiver.account_id)
-            edges.append(
-                {
-                    "event_id": ev.event_id,
-                    "source": ev.sender.account_id,
-                    "target": ev.receiver.account_id,
-                    "amount_minor_units": ev.amount_minor_units,
-                    "currency": ev.currency,
-                    "occurred_at": ev.occurred_at.isoformat(),
-                }
+        graph = self._graphs.graph(case_id)
+        if graph is None:
+            self._graphs.add_events(
+                case_id, await self._events.get_by_case_id(case_id)
             )
+            graph = self._graphs.graph(case_id)
+            assert graph is not None
+
+        edges = [
+            {
+                "event_id": edge.event_id,
+                "source": edge.sender_id,
+                "target": edge.receiver_id,
+                "amount_minor_units": edge.amount_minor_units,
+                "currency": edge.currency,
+                "occurred_at": edge.occurred_at.isoformat(),
+                "status": edge.status.value,
+            }
+            for edge in graph.events_between(active_only=False)
+        ]
 
         return {
             "case_id": case_id,
-            "node_count": len(nodes),
-            "edge_count": len(edges),
-            "nodes": sorted(nodes),
+            "node_count": graph.node_count,
+            "edge_count": graph.edge_count,
+            "nodes": sorted(graph.accounts),
             "edges": edges,
         }
 
@@ -91,9 +92,11 @@ class EventService:
         self,
         case_repo: CaseRepository,
         event_repo: EventRepository,
+        graph_registry: CaseGraphRegistry,
     ) -> None:
         self._cases = case_repo
         self._events = event_repo
+        self._graphs = graph_registry
 
     async def ingest_event(
         self, event: TransactionEvent, case_id: str
@@ -106,7 +109,7 @@ class EventService:
             raise ValueError(f"Case '{case_id}' not found.")
         # Duplicate event_id check is enforced inside the repository.
         await self._events.save(event, case_id)
-        # TODO: forward to temporal graph service when available.
+        self._graphs.add_event(case_id, event)
         return event
 
     async def ingest_batch(
@@ -119,5 +122,5 @@ class EventService:
         if not await self._cases.exists(case_id):
             raise ValueError(f"Case '{case_id}' not found.")
         await self._events.save_batch(events, case_id)
-        # TODO: forward batch to temporal graph service when available.
+        self._graphs.add_events(case_id, events)
         return events
