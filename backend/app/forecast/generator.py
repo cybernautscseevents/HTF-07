@@ -30,7 +30,7 @@ from backend.app.forecast.models import (
     ForecastTransactionEvent,
 )
 from backend.app.graph.temporal_graph import TemporalGraph
-from backend.app.ml.next_hop import NextHopPredictor
+from backend.app.ml.next_hop import NextHopPredictor, get_upstream_ancestors
 from backend.app.taint.engine import TaintEngine
 from backend.app.taint.models import TaintResult, TaintSeed
 from contracts.account import AccountReference
@@ -185,8 +185,11 @@ class ForecastPathGenerator:
         """Run beam search starting from a single source account."""
         # Initial beam with empty hops
         # Beam entry: (current_account, cumulative_probability, hops, visited_set)
+        # Avoid revisiting prior accounts in the historical flow leading into source_id
+        upstream_ancestors = get_upstream_ancestors(graph, source_id, simulation_timestamp)
+        initial_visited = {source_id} | upstream_ancestors
         current_beam: list[tuple[str, float, list[ForecastHop], set[str]]] = [
-            (source_id, 1.0, [], {source_id})
+            (source_id, 1.0, [], initial_visited)
         ]
 
         completed_paths: list[ForecastPath] = []

@@ -7,6 +7,7 @@ Business logic lives in the service layer, not here.
 
 from fastapi import FastAPI
 
+from backend.app.api.analysis import router as analysis_router
 from backend.app.api.cases import router as cases_router
 from backend.app.api.events import router as events_router
 
@@ -20,6 +21,7 @@ app = FastAPI(
 
 app.include_router(cases_router)
 app.include_router(events_router)
+app.include_router(analysis_router)
 
 
 # ── Health ───────────────────────────────────────────────────────────────────

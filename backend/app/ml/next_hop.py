@@ -44,6 +44,24 @@ def _softmax(x: np.ndarray, temperature: float = 1.0) -> np.ndarray:
     return e_x / np.sum(e_x)
 
 
+def get_upstream_ancestors(
+    graph: TemporalGraph, account_id: str, as_of_time: datetime
+) -> set[str]:
+    """Find all prior accounts that sent funds flowing into account_id up to as_of_time."""
+    ancestors: set[str] = set()
+    queue = [account_id]
+    visited = {account_id}
+    while queue:
+        curr = queue.pop(0)
+        for edge in graph.incoming(curr, end=as_of_time, active_only=True):
+            sender = edge.sender_id
+            if sender not in visited:
+                visited.add(sender)
+                ancestors.add(sender)
+                queue.append(sender)
+    return ancestors
+
+
 class NextHopPredictor:
     """Predicts next-hop account destinations given graph state."""
 
@@ -118,7 +136,13 @@ class NextHopPredictor:
             # Active accounts observed in the graph up to as_of_time
             edges_up_to = graph.events_between(end=as_of_time, active_only=True)
             active_nodes = {e.sender_id for e in edges_up_to} | {e.receiver_id for e in edges_up_to}
-            candidates = [c for c in active_nodes if c != source_account_id]
+            # Exclude upstream ancestors in the observed flow leading into source_account_id
+            # to strictly prevent reversing observed flow direction or revisiting prior accounts.
+            upstream_ancestors = get_upstream_ancestors(graph, source_account_id, as_of_time)
+            candidates = [
+                c for c in active_nodes
+                if c != source_account_id and c not in upstream_ancestors
+            ]
 
         if not candidates:
             return NextHopPrediction(
@@ -156,14 +180,33 @@ class NextHopPredictor:
             # Heuristic baseline if not yet fitted: score by shared counterparties and capacity
             raw_scores = []
             for fd in feature_dicts:
-                score = (
+                # Evidence requires a plausible relational link:
+                # past outbound transfers, shared counterparties, or shared institution.
+                relational_evidence = (
                     fd["past_transfers_count"] * 2.0
                     + fd["shared_counterparties_count"] * 1.5
-                    + fd["candidate_in_degree"] * 0.5
                     + fd["same_institution"] * 0.5
                 )
+                if relational_evidence > 0.0:
+                    score = relational_evidence + fd["candidate_in_degree"] * 0.5
+                else:
+                    score = 0.0
                 raw_scores.append(score)
-            norm_probas = _softmax(np.array(raw_scores, dtype=np.float32), temperature=1.0)
+
+            valid_cand_indices = [i for i, s in enumerate(raw_scores) if s > 0.0]
+            if not valid_cand_indices:
+                return NextHopPrediction(
+                    source_account_id=source_account_id,
+                    candidates=[],
+                    model_version=self.model_version,
+                    prediction_timestamp=as_of_time,
+                    top_1_account_id=None,
+                )
+
+            candidates = [candidates[i] for i in valid_cand_indices]
+            feature_dicts = [feature_dicts[i] for i in valid_cand_indices]
+            filtered_scores = np.array([raw_scores[i] for i in valid_cand_indices], dtype=np.float32)
+            norm_probas = _softmax(filtered_scores, temperature=1.0)
 
         # Rank candidates descending by probability
         ranked_indices = np.argsort(-norm_probas)
