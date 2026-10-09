@@ -20,7 +20,6 @@ from backend.app.counterfactual.models import (
     SourceInterceptionDetail,
 )
 from backend.app.counterfactual.simulator import CounterfactualSimulator
-from backend.app.forecast.candidates import generate_forecast_candidates
 from backend.app.forecast.generator import (
     ForecastGeneratorConfig,
     ForecastPath,
@@ -166,6 +165,8 @@ class ForecastAwareCounterfactualEvaluator:
         self, include_edge_holds: bool = False
     ) -> list[InterventionCandidate]:
         """Generate visible intervention candidates for this forecast evaluation."""
+        from backend.app.forecast.candidates import generate_forecast_candidates
+
         return generate_forecast_candidates(
             graph=self.historical_graph,
             taint_at_t=self.taint_at_t,
