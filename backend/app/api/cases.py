@@ -46,6 +46,15 @@ async def create_case(
     return created.model_dump(mode="json")
 
 
+@router.get("")
+async def list_cases(
+    svc: CaseService = Depends(get_case_service),
+) -> list[dict]:
+    """List all stored fraud cases."""
+    cases = await svc.list_cases()
+    return [c.model_dump(mode="json") for c in cases]
+
+
 @router.get("/{case_id}")
 async def get_case(
     case_id: str,

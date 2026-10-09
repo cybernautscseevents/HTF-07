@@ -110,6 +110,19 @@ class TestGetCase:
         resp = await client.get("/api/cases/nonexistent")
         assert resp.status_code == 404
 
+    @pytest.mark.asyncio
+    async def test_list_all_cases(self, client):
+        resp_initial = await client.get("/api/cases")
+        assert resp_initial.status_code == 200
+        assert isinstance(resp_initial.json(), list)
+
+        await client.post("/api/cases", content=json.dumps(VALID_CASE))
+        resp = await client.get("/api/cases")
+        assert resp.status_code == 200
+        cases = resp.json()
+        assert len(cases) >= 1
+        assert any(c["case_id"] == "case-001" for c in cases)
+
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # EVENT TESTS

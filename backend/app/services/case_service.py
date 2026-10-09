@@ -38,6 +38,9 @@ class CaseService:
     async def get_case(self, case_id: str) -> FraudCase | None:
         return await self._cases.get(case_id)
 
+    async def list_cases(self) -> list[FraudCase]:
+        return await self._cases.list_all()
+
     async def get_timeline(self, case_id: str) -> list[TransactionEvent]:
         """
         Return events for a case ordered by occurred_at (ascending).

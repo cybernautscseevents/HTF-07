@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AEGIS-Flow",
-  description: "AEGIS-Flow - Temporal Fraud-Flow Intervention Engine",
+  title: "AEGIS-Flow — Financial Investigation Workstation",
+  description: "Investigate reported payments, follow multi-hop money movement across pooled accounts, and evaluate targeted interventions.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

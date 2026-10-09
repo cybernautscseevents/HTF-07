@@ -71,36 +71,61 @@ Synthetic Data Layer
 
 ---
 
-## Technology Stack (Initial)
+## Technology Stack
 
 | Layer | Technology |
-|-------|-----------|
-| Language | Python 3.11+ |
-| Graph Engine | NetworkX (prototype); igraph (scale) |
-| ML / Gradient Boosting | scikit-learn, XGBoost |
-| Graph Neural Networks | PyTorch Geometric (next-hop model) |
-| Data / Serialization | pandas, pyarrow, JSON |
-| Backend API | FastAPI |
-| Frontend | React + D3.js |
-| Configuration | python-dotenv |
-| Testing | pytest |
-| Synthetic Data Generation | Custom scripts (Faker + controlled topology) |
-| LLM Integration (optional) | Google Gemini API (explanation only) |
+|---|---|
+| Language | Python 3.11+, TypeScript 5.9 |
+| Graph Engine | NetworkX, igraph, Temporal Directed Multigraphs |
+| ML & Forecast | scikit-learn, LightGBM, Monte Carlo Trajectory Forecasts |
+| Backend API | FastAPI, Pydantic v2, Uvicorn |
+| Frontend Workspace | Next.js 16 (Turbopack), React 19, Tailwind CSS 4, Cytoscape.js 3.34, Lucide Icons |
+| Verification & Testing | pytest (342 Python tests), Node.js native test runner (21 frontend unit tests) |
 
 ---
 
-## Repository Structure
+## Quickstart & Demo Walkthrough
 
+### 1. Start the FastAPI Backend
+```bash
+# Activate virtual environment if on Windows:
+.venv\Scripts\uvicorn backend.app.main:app --reload --port 8000
 ```
-aegis-flow/
-├── backend/        # FastAPI application, graph engine, taint engine, ML models, API routes
-├── frontend/       # React dashboard, D3 graph visualizer, intervention explorer
-├── data/           # Synthetic datasets, schemas, benchmark fixtures
-├── docs/           # Architecture notes, algorithm specs, design decisions
-├── scripts/        # Data generation, benchmark runners, utility scripts
-├── tests/          # Unit and integration tests
-├── .env.example    # Environment variable template
-└── README.md       # This file
+Backend API docs are available at `http://localhost:8000/docs` and health check at `http://localhost:8000/health`.
+
+### 2. Start the Frontend Command Center
+```bash
+cd frontend
+npm install
+npm run dev
+```
+Open `http://localhost:3000` to access the investigator workspace.
+
+### 3. Load & Run the Deterministic Demo Case
+1. In the top navigation bar, click **"Load Demo Case"**.
+2. This creates synthetic fraud case **Operation ShatterFlow** (`case-demo-synthetic-001`) with ₹5,00,000 initial theft, 3-layer branching, clean commingling, and an egress mule.
+3. Click **"Run Full Analysis"** to invoke `POST /api/cases/case-demo-synthetic-001/analyze`.
+4. Inspect:
+   - **Transaction Graph**: Cytoscape visualization distinguishing observed historical edges from dashed cyan forecast trajectories and orange min-cut chokepoint barriers.
+   - **Timeline Scrubber**: Scrub decision timestamp $T$ to observe evidence available at decision time vs. later discoveries.
+   - **Money Provenance**: FIFO taint propagation, tainted balances per mule, and legal caveats.
+   - **ML Intelligence**: Account risk scores, next-hop probabilities, and generated Monte Carlo paths.
+   - **Intervention Comparison**: Multi-objective candidate trade-offs comparing illicit capital intercepted against legitimate capital affected.
+
+---
+
+## Testing
+
+```bash
+# Backend pytest suite (342 tests)
+.venv\Scripts\python -m pytest
+
+# Frontend test suite (21 unit tests)
+cd frontend
+npm test
+npm run lint
+npx tsc --noEmit
+npm run build
 ```
 
 ---

@@ -21,6 +21,8 @@ from backend.app.api.schemas.analysis import (
     CandidateRecommendation,
     ChokepointReport,
     EvaluatedCandidateSummary,
+    ForecastHopDetail,
+    ForecastPathDetail,
     ForecastReport,
     GraphSummary,
     InvestigationAnalysisRequest,
@@ -37,6 +39,7 @@ from backend.app.counterfactual.simulator import CounterfactualSimulator
 from backend.app.forecast.candidates import generate_forecast_candidates
 from backend.app.forecast.evaluator import ForecastAwareCounterfactualEvaluator
 from backend.app.forecast.generator import ForecastGeneratorConfig
+from backend.app.forecast.models import ForecastAwareCounterfactualResult
 from backend.app.graph.temporal_graph import TemporalGraph
 from backend.app.ml.next_hop import NextHopPredictor
 from backend.app.ml.risk_model import MuleRiskModel
@@ -310,10 +313,30 @@ class InvestigationOrchestrator:
                     config=fc_cfg,
                 )
                 if len(fc_evaluator.paths) > 0:
+                    converted_paths = [
+                        ForecastPathDetail(
+                            path_id=p.path_id,
+                            source_account_id=p.source_account_id,
+                            cumulative_probability=p.cumulative_probability,
+                            accounts_sequence=list(p.accounts_sequence),
+                            hops=[
+                                ForecastHopDetail(
+                                    from_account_id=h.from_account_id,
+                                    to_account_id=h.to_account_id,
+                                    amount_minor_units=h.amount_minor_units,
+                                    probability=h.probability,
+                                    occurred_at=h.occurred_at,
+                                )
+                                for h in p.hops
+                            ],
+                        )
+                        for p in fc_evaluator.paths
+                    ]
                     forecast_report = ForecastReport(
                         status="available",
                         paths_generated_count=len(fc_evaluator.paths),
                         scenarios_evaluated_count=len(fc_evaluator.scenarios),
+                        paths=converted_paths,
                     )
                     stages["forecast_simulation"] = StageReport(
                         status=StageExecutionStatus.AVAILABLE,
@@ -474,9 +497,52 @@ class InvestigationOrchestrator:
             constraints=constraints,
         )
 
+        all_candidates_data: list[CandidateRecommendation] = []
+        for ev in opt_output.evaluations:
+            fc_res = (
+                ev.result
+                if isinstance(ev.result, ForecastAwareCounterfactualResult)
+                else None
+            )
+            all_candidates_data.append(
+                CandidateRecommendation(
+                    intervention_id=ev.intervention_id,
+                    intervention_type=ev.candidate.intervention_type.value,
+                    target_account_id=ev.candidate.target_account_id,
+                    target_event_id=ev.candidate.target_event_id,
+                    modeled_tainted_capital_intercepted=ev.result.modeled_tainted_capital_intercepted,
+                    modeled_legitimate_capital_affected=ev.result.modeled_legitimate_capital_affected,
+                    remaining_downstream_taint=ev.result.remaining_downstream_taint,
+                    number_of_affected_edges=ev.result.number_of_affected_edges,
+                    number_of_affected_accounts=ev.result.number_of_affected_accounts,
+                    provenance_confidence=ev.result.provenance_confidence,
+                    recovery_efficiency=str(ev.recovery_efficiency),
+                    policy_feasible=ev.feasible,
+                    explanation=ev.result.explanation,
+                    expected_illicit_interception=fc_res.expected_illicit_interception if fc_res else None,
+                    worst_case_illicit_interception=fc_res.worst_case_illicit_interception if fc_res else None,
+                    expected_legitimate_impact=fc_res.expected_legitimate_impact if fc_res else None,
+                    worst_case_legitimate_impact=fc_res.worst_case_legitimate_impact if fc_res else None,
+                    constraint_satisfaction_probability=fc_res.constraint_satisfaction_probability if fc_res else None,
+                    pareto_rank=ev.pareto_rank,
+                    dominated_by=list(ev.dominated_by_intervention_ids),
+                    constraint_violations=list(ev.constraint_violations),
+                )
+            )
+
+        competing_candidates_data = [
+            {"intervention_id": c.intervention_id, "reason": c.reason}
+            for c in opt_output.explanation.competing_candidates
+        ]
+
         selected_rec: CandidateRecommendation | None = None
         if opt_output.selected_evaluation is not None:
             sel = opt_output.selected_evaluation
+            fc_sel = (
+                sel.result
+                if isinstance(sel.result, ForecastAwareCounterfactualResult)
+                else None
+            )
             selected_rec = CandidateRecommendation(
                 intervention_id=sel.intervention_id,
                 intervention_type=sel.candidate.intervention_type.value,
@@ -491,6 +557,14 @@ class InvestigationOrchestrator:
                 recovery_efficiency=str(sel.recovery_efficiency),
                 policy_feasible=sel.feasible,
                 explanation=sel.result.explanation,
+                expected_illicit_interception=fc_sel.expected_illicit_interception if fc_sel else None,
+                worst_case_illicit_interception=fc_sel.worst_case_illicit_interception if fc_sel else None,
+                expected_legitimate_impact=fc_sel.expected_legitimate_impact if fc_sel else None,
+                worst_case_legitimate_impact=fc_sel.worst_case_legitimate_impact if fc_sel else None,
+                constraint_satisfaction_probability=fc_sel.constraint_satisfaction_probability if fc_sel else None,
+                pareto_rank=sel.pareto_rank,
+                dominated_by=list(sel.dominated_by_intervention_ids),
+                constraint_violations=list(sel.constraint_violations),
             )
             stages["intervention_optimization"] = StageReport(
                 status=StageExecutionStatus.AVAILABLE,
@@ -563,5 +637,7 @@ class InvestigationOrchestrator:
             chokepoint_report=chokepoint_report,
             evaluated_candidates=evaluated_summary,
             selected_recommendation=selected_rec,
+            all_candidates=all_candidates_data,
+            competing_candidates=competing_candidates_data,
             warnings_and_limitations=warnings_and_limitations,
         )

@@ -181,6 +181,30 @@ class ChokepointReport(BaseModel):
     explanation_summary: str | None = None
 
 
+class ForecastHopDetail(BaseModel):
+    """Single predicted hop in a future trajectory."""
+
+    model_config = ConfigDict(frozen=True)
+
+    from_account_id: str
+    to_account_id: str
+    amount_minor_units: int
+    probability: float
+    occurred_at: datetime
+
+
+class ForecastPathDetail(BaseModel):
+    """A bounded, plausible future trajectory."""
+
+    model_config = ConfigDict(frozen=True)
+
+    path_id: str
+    source_account_id: str
+    cumulative_probability: float
+    accounts_sequence: list[str]
+    hops: list[ForecastHopDetail]
+
+
 class ForecastReport(BaseModel):
     """Summary of forecast-aware future scenario generation."""
 
@@ -189,6 +213,7 @@ class ForecastReport(BaseModel):
     status: str
     paths_generated_count: int
     scenarios_evaluated_count: int
+    paths: list[ForecastPathDetail] = Field(default_factory=list)
 
 
 class CandidateRecommendation(BaseModel):
@@ -209,6 +234,14 @@ class CandidateRecommendation(BaseModel):
     recovery_efficiency: str
     policy_feasible: bool
     explanation: str
+    expected_illicit_interception: int | None = None
+    worst_case_illicit_interception: int | None = None
+    expected_legitimate_impact: int | None = None
+    worst_case_legitimate_impact: int | None = None
+    constraint_satisfaction_probability: float | None = None
+    pareto_rank: int | None = None
+    dominated_by: list[str] = Field(default_factory=list)
+    constraint_violations: list[str] = Field(default_factory=list)
 
 
 class EvaluatedCandidateSummary(BaseModel):
@@ -240,4 +273,6 @@ class InvestigationAnalysisResponse(BaseModel):
     chokepoint_report: ChokepointReport | None = None
     evaluated_candidates: EvaluatedCandidateSummary
     selected_recommendation: CandidateRecommendation | None = None
+    all_candidates: list[CandidateRecommendation] = Field(default_factory=list)
+    competing_candidates: list[dict[str, str]] = Field(default_factory=list)
     warnings_and_limitations: list[str]
